@@ -177,8 +177,32 @@ INSERT INTO ventas (id_producto, cantidad, fecha_venta, total_venta) VALUES
 -- Consultas a realizar:
 
 -- Muestra el nombre de cada producto, su precio con un 15% de descuento y el stock disponible.
+    SELECT nombre_producto, precio, precio * 0.85 AS precio_descuento, stock
+    FROM productos;
 -- Calcula la cantidad total de productos vendidos por categoría, y muestra solo aquellas con más de 3 productos vendidos.
+    SELECT categoria, SUM(cantidad) AS total_vendidos
+    FROM ventas
+    INNER JOIN productos ON ventas.id_producto = productos.id_producto
+    GROUP BY categoria
+    HAVING SUM(cantidad) > 3;
 -- Muestra el total de ventas por día, ordenando de mayor a menor.
+    SELECT fecha_venta, SUM(total_venta) AS total_por_dia
+    FROM ventas
+    GROUP BY fecha_venta
+    ORDER BY total_por_dia DESC;
+
+
 -- Encuentra productos con un nombre que contenga la palabra "Smart" o que pertenezcan a la categoría "Accesorios".
+
+    SELECT nombre_producto, categoria
+    FROM productos
+    WHERE nombre_producto LIKE '%Smart%' OR categoria = 'Accesorios';
+
+
 -- Muestra aquellos productos cuyo stock sea inferior a 10, o que no tengan categoría asignada.
+
+SELECT nombre_producto, stock, categoria
+FROM productos
+WHERE stock < 10 OR categoria IS NULL;
+
 
