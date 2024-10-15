@@ -52,7 +52,7 @@ CREATE TABLE prestamos (
 -- AVG: Calcula el promedio.
 
 -----------------------------------------
---Ejercicios
+--Ejercicios de clase
 
 CREATE DATABASE ejercicios_sql;
 \c ejercicios_sql;
@@ -101,3 +101,84 @@ INSERT INTO alumnos (nombre, nota, telefono) VALUES
 ('Carlos', 8.5, '987654321'),
 ('Ana', 9.5, NULL),
 ('Daniel', 6.0, '567890123');
+
+
+
+-----------------------
+SELECT nombre_producto, precio, precio * 0.9 AS precio_descuento
+FROM productos
+WHERE precio BETWEEN 50 AND 200;
+-------------------
+SELECT departamento, COUNT(*) AS total_empleados, AVG(salario) AS salario_promedio
+FROM empleados
+GROUP BY departamento
+HAVING COUNT(*) > 2
+ORDER BY salario_promedio DESC;
+-----------------------
+SELECT COUNT(*) AS total_alumnos
+FROM alumnos
+WHERE (nota > 8 OR nombre LIKE 'A%')
+AND telefono IS NOT NULL;
+
+-------------------------------------------------------------------------------------------------
+
+-- Ejercicio 1: Gestión de Inventario en una Tienda
+-- Consigna
+-- Se requiere gestionar un inventario para una tienda que vende productos de tecnología. El objetivo es crear una base de datos que permita realizar consultas sobre los productos disponibles, sus categorías y el historial de ventas.
+
+-- Crear la base de datos:
+CREATE DATABASE tienda_tecnologia;
+-- Crear las tablas:
+
+-- Tabla productos con los campos: id_producto (serial, PK), nombre_producto (varchar(50), NOT NULL), precio (numeric, NOT NULL), stock (int, NOT NULL), categoria (varchar(50)).
+-- Tabla ventas con los campos: id_venta (serial, PK), id_producto (int, NOT NULL), cantidad (int, NOT NULL), fecha_venta (date, NOT NULL), total_venta (numeric).
+-- Tabla categorias con los campos: id_categoria (serial, PK), nombre_categoria (varchar(50), NOT NULL).
+CREATE TABLE productos (
+    id_producto SERIAL PRIMARY KEY,
+    nombre_producto VARCHAR(50) NOT NULL,
+    precio NUMERIC NOT NULL,
+    stock INT NOT NULL,
+    categoria VARCHAR(50)
+);
+
+CREATE TABLE ventas (
+    id_venta SERIAL PRIMARY KEY,
+    id_producto INT NOT NULL,
+    cantidad INT NOT NULL,
+    fecha_venta DATE NOT NULL,
+    total_venta NUMERIC,
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+);
+
+CREATE TABLE categorias (
+    id_categoria SERIAL PRIMARY KEY,
+    nombre_categoria VARCHAR(50) NOT NULL
+);
+-- Insertar datos de prueba:
+
+-- Inserta al menos 5 productos, 3 categorías y 3 ventas en la base de datos.
+-- Asegúrate de que algunas ventas sean de productos con categoría "Electrónica" y "Accesorios".
+
+INSERT INTO productos (nombre_producto, precio, stock, categoria) VALUES
+('Laptop', 1500, 10, 'Electrónica'),
+('Mouse', 25, 50, 'Accesorios'),
+('Teclado', 45, 30, 'Accesorios'),
+('Smartphone', 800, 20, 'Electrónica'),
+('Cámara', 1200, 5, 'Fotografía');
+
+INSERT INTO categorias (nombre_categoria) VALUES
+('Electrónica'), ('Accesorios'), ('Fotografía');
+
+INSERT INTO ventas (id_producto, cantidad, fecha_venta, total_venta) VALUES
+(1, 2, '2024-10-10', 3000),
+(2, 5, '2024-10-11', 125),
+(4, 1, '2024-10-12', 800);
+
+-- Consultas a realizar:
+
+-- Muestra el nombre de cada producto, su precio con un 15% de descuento y el stock disponible.
+-- Calcula la cantidad total de productos vendidos por categoría, y muestra solo aquellas con más de 3 productos vendidos.
+-- Muestra el total de ventas por día, ordenando de mayor a menor.
+-- Encuentra productos con un nombre que contenga la palabra "Smart" o que pertenezcan a la categoría "Accesorios".
+-- Muestra aquellos productos cuyo stock sea inferior a 10, o que no tengan categoría asignada.
+
