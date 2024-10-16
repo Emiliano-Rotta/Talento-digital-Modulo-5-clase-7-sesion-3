@@ -239,7 +239,7 @@ CREATE TABLE notas (
     id_nota SERIAL PRIMARY KEY,
     id_alumno INT NOT NULL,
     id_materia INT NOT NULL,
-    nota NUMERIC NOT NULL,
+    nota NUMERIC,
     fecha DATE NOT NULL,
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia)
