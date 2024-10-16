@@ -271,12 +271,34 @@ INSERT INTO notas (id_alumno, id_materia, nota, fecha) VALUES
 -- Consultas a realizar:
 
 -- Encuentra el promedio de notas por alumno, y muestra solo aquellos con un promedio superior a 7.
+    SELECT nombre, apellido, AVG(nota) AS promedio
+    FROM alumnos
+    JOIN notas ON alumnos.id_alumno = notas.id_alumno
+    GROUP BY nombre, apellido
+    HAVING AVG(nota) > 7;
 -- Muestra las materias en las que al menos un alumno tiene una nota nula.
--- Lista los alumnos con sus edades, calculadas a partir de la fecha de nacimiento.
--- Muestra el total de notas registradas por ciudad, ordenando de mayor a menor.
--- Filtra los alumnos cuyo nombre empiece con 'A' o que no tengan asignada ninguna ciudad.
--- Estos ejercicios permiten que los estudiantes practiquen de manera más extensa y completa con los operadores básicos, la sentencia SELECT y las funciones de agregación en PostgreSQL.
+    SELECT nombre_materia
+    FROM materias
+    JOIN notas ON materias.id_materia = notas.id_materia
+    WHERE nota IS NULL;
 
+
+-- Lista los alumnos con sus edades, calculadas a partir de la fecha de nacimiento.
+    SELECT nombre, apellido, EXTRACT(YEAR FROM AGE(fecha_nacimiento)) AS edad
+    FROM alumnos;
+
+-- Muestra el total de notas registradas por ciudad, ordenando de mayor a menor.
+    SELECT ciudad, COUNT(*) AS total_notas
+    FROM alumnos
+    JOIN notas ON alumnos.id_alumno = notas.id_alumno
+    GROUP BY ciudad
+    ORDER BY total_notas DESC;
+
+-- Filtra los alumnos cuyo nombre empiece con 'A' o que no tengan asignada ninguna ciudad.
+
+    SELECT nombre, apellido, ciudad
+    FROM alumnos
+    WHERE nombre LIKE 'A%' OR ciudad IS NULL;
 
 ------------------------------------------------------------------------------------------
 
@@ -345,7 +367,39 @@ INSERT INTO prestamos (id_libro, fecha_prestamo, fecha_devolucion, id_autor) VAL
 -- Consultas a realizar:
 
 -- Muestra los libros disponibles junto con el nombre del autor, ordenados por el año de publicación.
+   
+    SELECT titulo, nombre_autor, año_publicacion
+    FROM libros
+    JOIN prestamos ON libros.id_libro = prestamos.id_libro
+    JOIN autores ON prestamos.id_autor = autores.id_autor
+    WHERE disponible = TRUE
+    ORDER BY año_publicacion;
 -- Encuentra los libros que no han sido devueltos (donde fecha_devolucion es nula).
+   
+    SELECT titulo
+    FROM libros
+    JOIN prestamos ON libros.id_libro = prestamos.id_libro
+    WHERE fecha_devolucion IS NULL;
+
 -- Calcula el número total de préstamos por género literario, y muestra solo aquellos géneros con más de un préstamo.
+    
+    SELECT genero, COUNT(*) AS total_prestamos
+    FROM libros
+    JOIN prestamos ON libros.id_libro = prestamos.id_libro
+    GROUP BY genero
+    HAVING COUNT(*) > 1;
+
 -- Filtra los autores cuya nacionalidad sea "Colombiano" o "Inglés", o que hayan escrito un libro publicado antes de 1950.
+    
+    SELECT nombre_autor, nacionalidad
+    FROM autores
+    JOIN prestamos ON autores.id_autor = prestamos.id_autor
+    JOIN libros ON prestamos.id_libro = libros.id_libro
+    WHERE nacionalidad IN ('Colombiano', 'Inglés') OR año_publicacion < 1950;
+    
 -- Muestra el título del libro y el tiempo (en días) que ha estado prestado si no se ha devuelto.
+
+    SELECT titulo, CURRENT_DATE - fecha_prestamo AS dias_prestado
+    FROM libros
+    JOIN prestamos ON libros.id_libro = prestamos.id_libro
+    WHERE fecha_devolucion IS NULL;
